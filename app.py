@@ -4,8 +4,8 @@ from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
-# استخدام مجلد السيرفر المؤقت
-PDF_FOLDER = '/tmp'
+# العودة للمجلد المحلي الطبيعي
+PDF_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = PDF_FOLDER
 
 ALLOWED_EXTENSIONS = {'pdf'}
@@ -16,16 +16,9 @@ def allowed_file(filename):
 @app.route('/')
 def index():
     query = request.args.get('q', '')
-    
-    # حماية برمجية: التأكد من وجود المجلد أو تهيئته سحابياً
     if not os.path.exists(PDF_FOLDER):
         os.makedirs(PDF_FOLDER)
-        
-    try:
-        files = os.listdir(PDF_FOLDER)
-    except Exception:
-        files = []
-        
+    files = os.listdir(PDF_FOLDER)
     if query:
         files = [f for f in files if query.lower() in f.lower()]
     return render_template('index.html', files=files, query=query)
@@ -42,3 +35,6 @@ def upload_file():
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         return redirect(url_for('index'))
     return "Invalid File Type. Only PDFs are allowed."
+
+if __name__ == '__main__':
+    app.run(debug=True)
