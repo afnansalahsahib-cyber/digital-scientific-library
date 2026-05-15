@@ -3,8 +3,8 @@ from flask import Flask, render_template, request, redirect, url_for
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-PDF_FOLDER = 'uploads'
-app.config['UPLOAD_FOLDER'] = PDF_FOLDER
+PDF_FOLDER = '/tmp'
+app.config['UPLOAD_FOLDER']='/tmp'
 # Allow only PDF files
 ALLOWED_EXTENSIONS = {'pdf'}
 
@@ -14,8 +14,6 @@ def allowed_file(filename):
 @app.route('/')
 def index():
     query = request.args.get('q', '')
-    if not os.path.exists(PDF_FOLDER):
-        os.makedirs(PDF_FOLDER)
     files = os.listdir(PDF_FOLDER)
     if query:
         files = [f for f in files if query.lower() in f.lower()]
@@ -33,6 +31,4 @@ def upload_file():
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         return redirect(url_for('index'))
     return "Invalid File Type. Only PDFs are allowed."
-
-if __name__ == '__main__':
-    app.run(debug=True)
+app=app
