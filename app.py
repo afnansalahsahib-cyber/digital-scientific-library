@@ -4,7 +4,7 @@ from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
-# تعديل المسار للمجلد المؤقت الخاص بـ Vercel
+# استخدام مجلد السيرفر المؤقت
 PDF_FOLDER = '/tmp'
 app.config['UPLOAD_FOLDER'] = PDF_FOLDER
 
@@ -16,8 +16,16 @@ def allowed_file(filename):
 @app.route('/')
 def index():
     query = request.args.get('q', '')
-    # سحب الملفات مباشرة من المجلد المؤقت
-    files = os.listdir(PDF_FOLDER)
+    
+    # حماية برمجية: التأكد من وجود المجلد أو تهيئته سحابياً
+    if not os.path.exists(PDF_FOLDER):
+        os.makedirs(PDF_FOLDER)
+        
+    try:
+        files = os.listdir(PDF_FOLDER)
+    except Exception:
+        files = []
+        
     if query:
         files = [f for f in files if query.lower() in f.lower()]
     return render_template('index.html', files=files, query=query)
@@ -34,4 +42,3 @@ def upload_file():
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         return redirect(url_for('index'))
     return "Invalid File Type. Only PDFs are allowed."
-app=app
