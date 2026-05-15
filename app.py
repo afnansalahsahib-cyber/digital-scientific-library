@@ -3,9 +3,11 @@ from flask import Flask, render_template, request, redirect, url_for
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
+
+# تعديل المسار للمجلد المؤقت الخاص بـ Vercel
 PDF_FOLDER = '/tmp'
-app.config['UPLOAD_FOLDER']='/tmp'
-# Allow only PDF files
+app.config['UPLOAD_FOLDER'] = PDF_FOLDER
+
 ALLOWED_EXTENSIONS = {'pdf'}
 
 def allowed_file(filename):
@@ -14,6 +16,7 @@ def allowed_file(filename):
 @app.route('/')
 def index():
     query = request.args.get('q', '')
+    # سحب الملفات مباشرة من المجلد المؤقت
     files = os.listdir(PDF_FOLDER)
     if query:
         files = [f for f in files if query.lower() in f.lower()]
@@ -31,4 +34,6 @@ def upload_file():
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         return redirect(url_for('index'))
     return "Invalid File Type. Only PDFs are allowed."
-app=app
+
+# هذا السطر ضروري جداً لـ Vercel وبدون مسافات بادئة
+app = app
