@@ -34,6 +34,4 @@ def upload_file():
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         return redirect(url_for('index'))
     return "Invalid File Type. Only PDFs are allowed."
-
-# هذا السطر ضروري جداً لـ Vercel وبدون مسافات بادئة
-app = app
+app=app
